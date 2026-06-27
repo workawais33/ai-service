@@ -4,7 +4,15 @@ from pydantic import BaseModel
 from dotenv import load_dotenv
 from groq import Groq
 import os
+from fastapi.middleware.cors import CORSMiddleware
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # later restrict to your frontend URL
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 load_dotenv()
 
 app = FastAPI()
