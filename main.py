@@ -1,21 +1,23 @@
 from fastapi import FastAPI
 from fastapi.responses import StreamingResponse
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv
 from groq import Groq
 import os
-from fastapi.middleware.cors import CORSMiddleware
 
+load_dotenv()
+
+app = FastAPI()
+
+# ✅ CORS must come AFTER app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # later restrict to your frontend URL
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-load_dotenv()
-
-app = FastAPI()
 
 api_key = os.getenv("GROQ_API_KEY")
 
@@ -35,7 +37,6 @@ def home():
 def chat(data: ChatRequest):
 
     def generate():
-
         stream = client.chat.completions.create(
             messages=[
                 {
@@ -49,11 +50,7 @@ def chat(data: ChatRequest):
 
         for chunk in stream:
             content = chunk.choices[0].delta.content
-
             if content:
                 yield content
 
-    return StreamingResponse(
-        generate(),
-        media_type="text/plain"
-    )
+    return StreamingResponse(generate(), media_type="text/plain")
