@@ -9,9 +9,12 @@ load_dotenv()
 
 app = FastAPI()
 
-client = Groq(
-    api_key=os.getenv("GROQ_API_KEY")
-)
+api_key = os.getenv("GROQ_API_KEY")
+
+if not api_key:
+    raise Exception("GROQ_API_KEY is missing in Railway environment variables")
+
+client = Groq(api_key=api_key)
 
 class ChatRequest(BaseModel):
     message: str
